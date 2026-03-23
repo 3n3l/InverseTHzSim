@@ -10,7 +10,7 @@ import measurement
 import setup_utils
 
 def get_mts_measurements(theta, update_fn, ctx_args):
-    update_fn(theta)
+    update_fn(theta.item())
     msr = measurement.Simulated(ctx_args['scene'])
     msr.calibrate(setup_utils.cal_path())
     return msr

@@ -89,10 +89,10 @@ class OneSphere(THZScene):
         self.translate_and_scale(mi.Vector3f(0.0, 0.0, -rad), rad)
         self.update_ref()
 
-    def translate_x(self, x):
+    def translate_x(self, x: float):
         self.translate(mi.Vector3f(x, 0.0, 0.0))
 
-    def translate_z(self, z):
+    def translate_z(self, z: float):
         self.translate(mi.Vector3f(0.0, 0.0, z))
 
     def translate_xy(self, theta):
