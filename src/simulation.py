@@ -231,19 +231,16 @@ def connect_to_Rx_dir(si, Rx, indices):
     return Rx_dist, throughput
 
 # Return Distances and Amplitudes for each path
+@dr.syntax
 def calc_paths(si, Rx, N_Paths, depth=1):
     i = mi.UInt(0)
     dist = mi.Float(0)
     amp = mi.Float(1)
 
-    loop = mi.Loop(name="", state=lambda: (i, dist, amp))
-
-    while loop(si.is_valid() & (i < depth)):
-        
+    indices = mi.UInt(0)
+    while si.is_valid() & (i < depth):
         indices = mi.UInt(dr.arange(mi.UInt, 0, N_Paths))
-
         travel_dist = si.t
-
         dist += dr.gather(mi.Float, travel_dist, indices, si.is_valid())
         i += 1
 
