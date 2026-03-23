@@ -7,11 +7,11 @@ import sampler as smp
 # helper class for manifold sampling
 class MSVertex:
     def __init__(self, si, mask_indices):
-        self.p = dr.gather(mi.Vector3f, si.p, mask_indices)
+        self.p = dr.gather(mi.Point3f, si.p, mask_indices)
         self.dp_du = dr.gather(mi.Vector3f, si.dp_du, mask_indices)
         self.dp_dv = dr.gather(mi.Vector3f, si.dp_dv, mask_indices)
         self.shape = dr.gather(mi.ShapePtr, si.shape, mask_indices)
-        self.n = dr.gather(mi.Vector3f, si.n, mask_indices)
+        self.n = dr.gather(mi.Normal3f, si.n, mask_indices)
         self.dn_du = dr.gather(mi.Vector3f, si.dn_du, mask_indices)
         self.dn_dv = dr.gather(mi.Vector3f, si.dn_dv, mask_indices)
 

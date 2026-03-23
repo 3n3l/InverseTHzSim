@@ -11,7 +11,7 @@ import manifold as ms
 import visualization as viz
 
 def connect_to_Rx(si, scene, Rx, indices):
-    temp = Rx - dr.gather(mi.Vector3f, si.p, mi.UInt(dr.arange(mi.UInt, 0, config['N_Paths'])))
+    temp = Rx - dr.gather(mi.Point3f, si.p, mi.UInt(dr.arange(mi.UInt, 0, config['N_Paths'])))
     dist_squared = dr.dot(temp, temp)
     dist_squared = dr.gather(mi.Float, dist_squared, indices)
     Rx_dist = dr.sqrt(dist_squared)
@@ -43,7 +43,7 @@ def connect_to_Rx(si, scene, Rx, indices):
     elif config['material'] == 'phong':
         r = ms.reflect(dr.gather(mi.Vector3f, si.wi, indices), dr.gather(mi.Vector3f, norms, indices))
         if config['relax_physics']:
-            throughput = throughput * ((config['phong_kd'] * dr.dot(dr.gather(mi.Vector3f, si.wi, indices), dr.gather(mi.Vector3f, si.n, indices))) + config['phong_ks'] * dr.select((dr.dot(r, wo) > 0.0), (dr.power(dr.dot(r, wo), config['phong_ns'])), 0.0))
+            throughput = throughput * ((config['phong_kd'] * dr.dot(dr.gather(mi.Vector3f, si.wi, indices), dr.gather(mi.Normal3f, si.n, indices))) + config['phong_ks'] * dr.select((dr.dot(r, wo) > 0.0), (dr.power(dr.dot(r, wo), config['phong_ns'])), 0.0))
         else:
             diffuse = config['phong_kd'] / np.pi
             specular = config['phong_ks'] * (config['phong_ns'] + 2) / (2*np.pi) * dr.select((dr.dot(r, wo) > 0.0), (dr.power(dr.dot(r, wo), config['phong_ns'])), 0.0)
@@ -123,8 +123,8 @@ def get_bounce(si, tp, scene):
     elif config['material'] == 'diffuse':
         new_tp = new_tp * dr.dot(dr.gather(mi.Vector3f, si.wi, indices), dr.gather(mi.Vector3f, si.n, indices))
     elif config['material'] == 'phong':
-        r = ms.reflect(dr.gather(mi.Vector3f, si.wi, indices), dr.gather(mi.Vector3f, si.n, indices))
-        new_tp = new_tp * ((config['phong_kd'] * dr.dot(dr.gather(mi.Vector3f, si.wi, indices), dr.gather(mi.Vector3f, si.n, indices))) + config['phong_ks'] * dr.select((dr.dot(r, wo_local) > 0.0), (dr.power(dr.dot(r, wo_local), config['phong_ns'])), 0.0))
+        r = ms.reflect(dr.gather(mi.Vector3f, si.wi, indices), dr.gather(mi.Normal3f, si.n, indices))
+        new_tp = new_tp * ((config['phong_kd'] * dr.dot(dr.gather(mi.Vector3f, si.wi, indices), dr.gather(mi.Normal3f, si.n, indices))) + config['phong_ks'] * dr.select((dr.dot(r, wo_local) > 0.0), (dr.power(dr.dot(r, wo_local), config['phong_ns'])), 0.0))
 
     rays = si.spawn_ray(wo)
     new_si, n_intersections = intersect_scene(rays, scene)
@@ -212,7 +212,7 @@ def simulate_measurements_multi(ctx_args, depth = 1):
     return real, imag
 
 def connect_to_Rx_dir(si, Rx, indices):
-    temp = Rx - dr.gather(mi.Vector3f, si.p, mi.UInt(dr.arange(mi.UInt, 0, sparams.N_Paths)))
+    temp = Rx - dr.gather(mi.Point3f, si.p, mi.UInt(dr.arange(mi.UInt, 0, sparams.N_Paths)))
     Rx_dist = dr.sqrt(dr.dot(temp,temp))
     Rx_dist = dr.gather(mi.Float, Rx_dist, indices)
 
