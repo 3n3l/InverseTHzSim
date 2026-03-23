@@ -110,7 +110,7 @@ class MIMOSAR:
         if Rx_idx:  
             self.Rx_mask[Rx_idx] = False
             self.params['Rx'] = dr.gather(mi.Vector3f, self._Rx, dr.compress(self.Rx_mask))
-            self.params['N_Rx'] = self._N_Rx - dr.count(~self.Rx_mask)
+            self.params['N_Rx'] = (self._N_Rx - dr.count(~self.Rx_mask)).item()
             print("Switched off Rx: ", Rx_idx)
 
         self.generate_starting_phase()
