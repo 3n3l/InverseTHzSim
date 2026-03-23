@@ -62,10 +62,8 @@ class MIMOSAR:
         self.params['N_Tx'] = N_Tx
         self.params['N_Rx'] = N_Rx
         self.params['N_Fq'] = N_Fq
-        self.Tx_mask = dr.empty(mi.Bool, self._N_Tx)
-        self.Tx_mask[:] = True
-        self.Rx_mask = dr.empty(mi.Bool, self._N_Rx)
-        self.Rx_mask[:] = True
+        self.Tx_mask = dr.full(dtype=mi.Bool, shape=self._N_Tx, value=True)
+        self.Rx_mask = dr.full(dtype=mi.Bool, shape=self._N_Rx, value=True)
 
     def generate_frequencies(self, f_start=235E9, f_stop=270E9):
         self._Fq = dr.zeros(mi.Float, self._N_Fq)
