@@ -143,7 +143,7 @@ def newton_solver(v0, v_init, v2, scene, step_scale, threshold, max_iters):
 
         si_current = scene.ray_intersect(ray_prop)
 
-        mask = si_current.is_valid() & dr.eq(si_current.shape, v.shape)
+        mask = si_current.is_valid() & (si_current.shape == v.shape)
         indices = dr.compress(mask)
 
         if dr.none(mask): # Missed scene completely or hit different shape (take smaller step)
