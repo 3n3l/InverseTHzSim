@@ -4,6 +4,8 @@ import math
 import sparams
 import sampler as smp
 
+from config import config
+
 # helper class for manifold sampling
 class MSVertex:
     def __init__(self, si, mask_indices):
@@ -135,8 +137,9 @@ def newton_solver(v0, v_init, v2, scene, step_scale, threshold, max_iters):
 
         temp = mi.Vector3f(scene.shapes()[0].bbox().center()) - p_prop
         dist_c = dr.norm(temp)
-        d_prop = dr.select((dist_c > sparams.init_scene_params['sphere_rad'] + 1e-5), dr.normalize(temp), dr.normalize(p_prop - v0))
-        ray_prop = dr.select((dist_c > sparams.init_scene_params['sphere_rad'] + 1e-5), mi.Ray3f(p_prop, d_prop), mi.Ray3f(v0, d_prop))
+        sphere_rad = sparams.measured_sphere_rad[config["ref_radius"]]
+        d_prop = dr.select((dist_c > sphere_rad + 1e-5), dr.normalize(temp), dr.normalize(p_prop - v0))
+        ray_prop = dr.select((dist_c > sphere_rad + 1e-5), mi.Ray3f(p_prop, d_prop), mi.Ray3f(v0, d_prop))
 
         si_current = scene.ray_intersect(ray_prop)
 
