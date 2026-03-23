@@ -202,9 +202,9 @@ def simulate_measurements_multi(ctx_args, depth = 1):
                 di = dr.gather(mi.Float, di, indices) + dr.gather(mi.Float, sii.t, indices) + dir
                 ampi = dr.gather(mi.Color1f, tpi, indices) * tpir
                 
-                dist = mi.TensorXf(dr.ravel(di), shape=[len(indices)])
-                amps = mi.TensorXf(dr.ravel(ampi), shape=[len(indices)]) / config['N_Paths']
-                Fq_t = mi.TensorXf(dr.ravel(sparams.mimo_system.get_param('Fq')), shape=[sparams.mimo_system.get_param('N_Fq')])
+                dist = mi.TensorXf(dr.ravel(di))
+                amps = mi.TensorXf(dr.ravel(ampi))
+                Fq_t = mi.TensorXf(dr.ravel(sparams.mimo_system.get_param("Fq")))
 
                 real, imag = get_measurement(real, imag, dist, amps, T_i, R_i, Fq_t)
                 dr.flush_malloc_cache()
