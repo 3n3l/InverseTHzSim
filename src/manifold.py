@@ -44,8 +44,8 @@ def d_sphcoords(w, dw_du, dw_dv):
     d_atan = dr.rcp(1 + yx * yx)
     d_phi = d_atan * mi.Vector2f(w.x * dw_du.y - w.y * dw_du.x, w.x*dw_dv.y - w.y*dw_dv.x) * dr.rcp(w.x*w.x)
 
-    if w.x == 0.0:
-        d_phi = 0.0
+    if dr.all(w.x == 0.0):
+        d_phi.x, d_phi.y = 0.0, 0.0
 
     return d_theta.x, d_phi.x, d_theta.y, d_phi.y
 
