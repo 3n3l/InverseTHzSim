@@ -57,8 +57,8 @@ def convert_rdm_to_data(rdm):
         for Rx in range(sparams.mimo_system.get_param('N_Rx')):
             for fq in range(sparams.mimo_system.get_param('N_Fq')):
                 idx = Rx * sparams.mimo_system.get_param('N_Tx') * sparams.mimo_system.get_param('N_Fq') + Tx * sparams.mimo_system.get_param('N_Fq') + fq
-                real[Tx, Rx, fq] = rdm[2*idx]
-                imag[Tx, Rx, fq] = rdm[2*idx+1]
+                real[Tx, Rx, fq] = rdm[2*idx][0]
+                imag[Tx, Rx, fq] = rdm[2*idx+1][0]
     return real, imag
 
 def load_real_measurement(path, NY):
