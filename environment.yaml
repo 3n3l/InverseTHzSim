@@ -1,0 +1,13 @@
+name: THZ
+channels:
+  - defaults
+dependencies:
+  - python=3.13
+  - matplotlib
+  - pytorch
+  - numpy
+  - scipy
+  - pip
+  - pip:
+    - pyvista
+    - trimesh
