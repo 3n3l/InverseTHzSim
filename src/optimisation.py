@@ -10,9 +10,16 @@ import measurement
 import setup_utils
 
 
+import timeit
+def test_sms_vs_multi(ctx_args):
+    n = 1
+    print(f"sms takes {timeit.timeit(lambda: measurement.Simulated(ctx_args["scene"], True), number=n):.2f}s")
+    # print(f"multi takes {timeit.timeit(lambda: measurement.Simulated(ctx_args["scene"], False), number=n):.2f}s")
+
+
 def get_mts_measurements(theta, update_fn, ctx_args):
     update_fn(theta)
-    msr = measurement.Simulated(ctx_args["scene"])
+    msr = measurement.Simulated(ctx_args["scene"], config["use_sms"])
     msr.calibrate(setup_utils.cal_path())
     return msr
 

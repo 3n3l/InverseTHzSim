@@ -276,12 +276,6 @@ def calc_paths(si, Rx, N_Paths, depth=1):
     dist = mi.Float(0)
     amp = mi.Float(1)
 
-    # loop = mi.Loop(name="", state=lambda: (i, dist, amp))
-    # while loop(si.is_valid() & (i < depth)):
-    # TODO: this is not looping
-    print("???", si.is_valid())
-    print("!!!", i)
-    print("...", depth)
     indices = mi.UInt(0)
     while si.is_valid() & (i < depth):
         indices = mi.UInt(dr.arange(mi.UInt, 0, N_Paths))
@@ -302,7 +296,12 @@ def calc_paths(si, Rx, N_Paths, depth=1):
 def simulate_measurements_ms(ctx_args, n_paths: int = 50):
     scene = ctx_args["scene"]
 
-    smp.init_RNG(n_paths)
+    # NOTE: this should respect the configuration here,
+    #       even though this gets called with the correct variable from the config
+    # smp.init_RNG(n_paths)
+    # print(f"n_paths = {n_paths}")
+    smp.init_RNG(config["N_Paths"])
+
     N_Tx = sparams.mimo_system.get_param("N_Tx")
     N_Rx = sparams.mimo_system.get_param("N_Rx")
     N_Fq = sparams.mimo_system.get_param("N_Fq")
@@ -320,9 +319,12 @@ def simulate_measurements_ms(ctx_args, n_paths: int = 50):
             Ri = mi.Vector3f(dr.slice(sparams.mimo_system.get_param("Rx"), R_i))
 
             # sms_success = False
-            sms_success, v_final = sms.sample_manifold(Ti, Ri, scene, 0.02, 1e-5, 250)
-            if not sms_success:
-                print("SMS FAILED")
+            # sms_success, v_final = sms.sample_manifold(Ti, Ri, scene, 0.02, 1e-5, 250)
+            sms_success, v_final = sms.sample_manifold(Ti, Ri, scene, 0.02, 1e-5, 50)
+            # if not sms_success:
+            #     print("??? SMS FAILED")
+            # else:
+            #     print("!!! SMS WORKED")
             pts = dr.slice(v_final.p, 0)
             n_paths = 1
 
@@ -332,23 +334,26 @@ def simulate_measurements_ms(ctx_args, n_paths: int = 50):
             if n_intersections == 0:
                 continue
 
-            result, amp = calc_paths(si, Ri, n_paths)
+            result, ampi = calc_paths(si, Ri, n_paths)
 
             # dist = mi.TensorXf(dr.ravel(result), shape=[n_paths])
             # amps = mi.TensorXf(dr.ones(mi.Float, n_paths), shape=[n_paths])
             # Fq_t = mi.TensorXf(dr.ravel(sparams.mimo_system.get_param("Fq")), shape=[sparams.mimo_system.get_param("N_Fq")])
+
             dist = mi.TensorXf(dr.ravel(result))
             amps = mi.TensorXf(dr.ones(mi.Float, n_paths))
+            # amps = mi.TensorXf(dr.ravel(ampi)) # NOTE: from ..._multi() method, might be wrong
             Fq_t = mi.TensorXf(dr.ravel(sparams.mimo_system.get_param("Fq")))
 
             real, imag = get_measurement(real, imag, dist, amps, T_i, R_i, Fq_t)
+            # dr.flush_malloc_cache() # NOTE: from ..._multi() method, might be wrong
 
     return real, imag
 
 
 def simulate_measurements(ctx_args, use_ms):
     if use_ms:
-        print("USING MANIFOLD SAMPLING")
+        # print("USING MANIFOLD SAMPLING")
         return simulate_measurements_ms(ctx_args, config["N_Paths"])
     else:
         return simulate_measurements_multi(ctx_args, depth=config["sim_depth"])

@@ -127,8 +127,8 @@ class MIMOSAR:
             self.Rx_mask[Rx_idx] = False
             self.params["Rx"] = dr.gather(mi.Vector3f, self._Rx, dr.compress(self.Rx_mask))
             # NOTE: dr.count() will cast this to an UInt, item() returns 
-            print("A:", type(self._N_Rx - dr.count(~self.Rx_mask)))  # pyright: ignore
-            print("B:", type(self._N_Rx - dr.count(~self.Rx_mask)).item())  # pyright: ignore
+            # print("A:", type(self._N_Rx - dr.count(~self.Rx_mask)))  # pyright: ignore
+            # print("B:", type(self._N_Rx - dr.count(~self.Rx_mask)).item())  # pyright: ignore
             self.params["N_Rx"] = (self._N_Rx - dr.count(~self.Rx_mask)).item()  # pyright: ignore
             print("Switched off Rx: ", Rx_idx)
 

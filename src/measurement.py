@@ -5,6 +5,7 @@ import utils
 import sparams
 import reconstruction as recon
 import matplotlib.pyplot as plt
+import simulation as sim
 
 
 class Measurement:
@@ -168,8 +169,8 @@ class Real(Measurement):
             start = batch * max_size
             end = min(N**2, (batch + 1) * max_size)
             i, j = np.unravel_index(np.arange(start, end), (N, N))
-            d = self.msr[i] - self.msr[j]) / torch.linalg.norm(torch.abs(self.msr[i]))
-            diffs[i, j] = torch.sum(torch.abs(d, axis=(1, 2, 3)).reshape(-1, 1) # pyright: ignore
+            d = (self.msr[i] - self.msr[j]) / torch.linalg.norm(torch.abs(self.msr[i]))
+            diffs[i, j] = torch.sum(torch.abs(d, axis=(1, 2, 3))).reshape(-1, 1) # pyright: ignore
 
         mask = ~torch.eye(N, dtype=torch.bool)
         mask = mask.unsqueeze(-1)  # Shape: [N, N, 1]
