@@ -27,8 +27,9 @@ class MSVertex:
         self.dn_du = dr.gather(mi.Vector3f, si.dn_du, mask_indices)
         self.dn_dv = dr.gather(mi.Vector3f, si.dn_dv, mask_indices)
 
-    def __str__(self):
-        return f"""Manifold Sampling Vertex: {id(self)}\n, self.p = {self.p},\n self.dp_du = {self.dp_du},\n self.dp_dv = {self.dp_dv},\n self.shape = {self.shape},\n self.n = {self.n},\n self.dn_du = {self.dn_du},\n self.dn_dv = {self.dn_dv}"""
+    # def __str__(self):
+    #     return f"""Manifold Sampling Vertex: {id(self)}\n, self.p = {self.p},\n self.dp_du = {self.dp_du},\n self.dp_dv = {self.dp_dv},\n self.shape = {self.shape},\n self.n = {self.n},\n self.dn_du = {self.dn_du},\n self.dn_dv = {self.dn_dv}"""
+
 
 # Manifold Sampling Helpers
 def reflect(w, n):
@@ -52,8 +53,8 @@ def sphcoords(w):
 
     # NOTE: original code compares whole phi against zero
     if phi[0] < 0.0:
-    # NOTE: this does not make a difference
-    # if phi[0] < 0.0 and phi[1] < 0.0:
+        # NOTE: this does not make a difference
+        # if phi[0] < 0.0 and phi[1] < 0.0:
         phi += 2.0 * math.pi
 
     return theta, phi
@@ -145,7 +146,7 @@ def step_anglediff(v0, v, v2):
 # Newton Solver for Manifold Sampling
 def newton_solver(v0, v_init, v2, scene, step_scale, threshold, max_iters):
     success = False
-    beta = 1.0 # Initial beta of 1.0 might be too large???
+    beta = 1.0  # Initial beta of 1.0 might be too large???
     # beta = 0.5 # Initial beta of 1.0 might be too large???
 
     # print(f"step_scale = {step_scale}, threshold = {threshold}, max_iters = {max_iters}")
@@ -183,6 +184,7 @@ def newton_solver(v0, v_init, v2, scene, step_scale, threshold, max_iters):
         # print(f"sphere_rad = {sphere_rad}, ref_radius = {config["ref_radius"]}")
 
         # # NOTE: original code from Mohamed, project the PROPosed ray against the center of the bbox
+        # # FIXME: THIS MAKES SMS FAIL ALL THE TIME
         # temp = mi.Vector3f(scene.shapes()[0].bbox().center()) - p_prop
         # # temp = p_prop - mi.Vector3f(scene.shapes()[0].bbox().center()) # NOTE: maybe wrong sign?
         # dist_c = dr.norm(temp)
@@ -190,13 +192,13 @@ def newton_solver(v0, v_init, v2, scene, step_scale, threshold, max_iters):
         # d_prop = dr.select((dist_c > sphere_rad + 1e-5), dr.normalize(temp), dr.normalize(p_prop - v0))
         # ray_prop = dr.select((dist_c > sphere_rad + 1e-5), mi.Ray3f(p_prop, d_prop), mi.Ray3f(v0, d_prop))
 
-        # # NOTE: based on SMS paper implementation, projects PROPosed ray against surface
-        # # 1. 
-        d_prop = dr.normalize(p_prop - v0)
-        ray_prop = mi.Ray3f(v0, d_prop)
-        # # 2.
-        # d_prop = dr.normalize(mi.Vector3f(scene.shapes()[0].bbox().center()) - p_prop)
-        # ray_prop = mi.Ray3f(p_prop, d_prop)
+        # NOTE: based on SMS paper implementation, projects PROPosed ray against surface
+        # # 1.
+        # d_prop = dr.normalize(p_prop - v0)
+        # ray_prop = mi.Ray3f(v0, d_prop)
+        # 2.
+        d_prop = dr.normalize(mi.Vector3f(scene.shapes()[0].bbox().center()) - p_prop)
+        ray_prop = mi.Ray3f(p_prop, d_prop)
 
         si_current = scene.ray_intersect(ray_prop)
         mask = si_current.is_valid() & (si_current.shape == v.shape)
@@ -237,7 +239,7 @@ def newton_solver(v0, v_init, v2, scene, step_scale, threshold, max_iters):
 
     # if not success:
     #     return False, v
-
+    #
     # return True, v
 
     return success, v
@@ -260,16 +262,17 @@ def newton_solver(v0, v_init, v2, scene, step_scale, threshold, max_iters):
 
 def sample_manifold(Ti, Ri, scene, step_scale=0.04, threshold=1e-5, max_iters=50):
     # print(f"now sampling manifold, max_iters = {max_iters}")
-    direction, _ = smp.sample_dir(Ti, scene, mode=config["sampling_strat"])
-    # direction, _ = smp.sample_dir(Ti, scene, mode="shape")
+    # direction, _ = smp.sample_dir(Ti, scene, mode=config["sampling_strat"])
+    direction, _ = smp.sample_dir(Ti, scene, mode="shape")
     wi = mi.Ray3f(o=Ti, d=direction)
     # print(wi)
     si = scene.ray_intersect(wi)
+    # NOTE: how many intersection are needed? could they be reduced on some criteria?
     v_init = MSVertex(si, dr.compress(si.is_valid()))  # all valid intersections
 
     # print(f"si.p = {si.p}")
-    print(f"v_init.p = {v_init.p}")
-    print()
+    # print(f"v_init.p = {v_init.p}")
+    # print()
 
     # print("si:", si)
     # print("v_init:", v_init)

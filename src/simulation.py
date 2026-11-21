@@ -321,8 +321,8 @@ def simulate_measurements_ms(ctx_args, n_paths: int = 50):
             # sms_success = False
             # sms_success, v_final = sms.sample_manifold(Ti, Ri, scene, 0.02, 1e-5, 250)
             sms_success, v_final = sms.sample_manifold(Ti, Ri, scene, 0.02, 1e-5, 50)
-            # if not sms_success:
-            #     print("??? SMS FAILED")
+            if not sms_success:
+                print("??? SMS FAILED")
             # else:
             #     print("!!! SMS WORKED")
             pts = dr.slice(v_final.p, 0)
