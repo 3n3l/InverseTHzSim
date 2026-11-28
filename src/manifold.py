@@ -141,7 +141,7 @@ def newton_solver(v0, v_init, v2, scene, step_scale, threshold, max_iters):
 
     for _ in range(max_iters):
         step_success, C, dX = step_anglediff(v0, v, v2)
-        if not step_success:
+        if not step_success or beta < 1e-5:  # Stop trying if the step size becomes too small
             break
 
         norm_C = dr.norm(C)
@@ -156,9 +156,9 @@ def newton_solver(v0, v_init, v2, scene, step_scale, threshold, max_iters):
 
         temp = mi.Vector3f(scene.shapes()[0].bbox().center()) - p_prop
         dist_c = dr.norm(temp)
-        sphere_rad = sparams.measured_sphere_rad[config["ref_radius"]]
-        d_prop = dr.select((dist_c > sphere_rad + 1e-5), dr.normalize(temp), dr.normalize(p_prop - v0))
-        ray_prop = dr.select((dist_c > sphere_rad + 1e-5), mi.Ray3f(p_prop, d_prop), mi.Ray3f(v0, d_prop))
+        should_use_sphere_ray = dist_c > sparams.measured_sphere_rad[config["ref_radius"]] + 1e-5
+        d_prop = dr.select(should_use_sphere_ray, dr.normalize(temp), dr.normalize(p_prop - v0))
+        ray_prop = dr.select(should_use_sphere_ray, mi.Ray3f(p_prop, d_prop), mi.Ray3f(v0, d_prop))
 
         si_current = scene.ray_intersect(ray_prop)
 
