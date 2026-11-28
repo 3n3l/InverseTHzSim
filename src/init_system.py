@@ -5,10 +5,12 @@ import torch
 
 from config import config
 
+
 def mega_kernel(state):
     dr.set_flag(dr.JitFlag.LoopRecord, state)
     dr.set_flag(dr.JitFlag.VCallRecord, state)
     dr.set_flag(dr.JitFlag.VCallOptimize, state)
+
 
 def comp_grad_r(flag: bool):
     config["render_grad"] = flag
