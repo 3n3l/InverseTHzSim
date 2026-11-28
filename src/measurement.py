@@ -264,9 +264,9 @@ class Calibration(Measurement):
 class Simulated(Measurement):
     def __init__(self, scene, ms=False):
         self.settings = {}
-        self.settings['scene_name'] = scene.get_name()
-        self.settings['random_phase'] = (config['cal_strat'] == 'simulated' or config['cal_strat'] == 'self')
-        self.settings['ms'] = ms
+        self.settings["scene_name"] = scene.get_name()
+        self.settings["random_phase"] = config["cal_strat"] == "simulated" or config["cal_strat"] == "self"
+        self.settings["ms"] = config["use_sms"]
         self.normalized = False
 
         if self.settings['random_phase']:
@@ -276,8 +276,8 @@ class Simulated(Measurement):
             'scene': scene.get_scene()
         }
 
-        real, imag = sim.run_simulation(self.ctx_args, use_ms=ms)
-        self.msr = torch.complex(real, imag).to(config['device'])
+        real, imag = sim.run_simulation(self.ctx_args, use_sms=self.settings["ms"])
+        self.msr = torch.complex(real, imag).to(config["device"])
 
     def save(self, path):
         utils.save_for_recon(self.msr.real, self.msr.imag, path)
