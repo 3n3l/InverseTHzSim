@@ -263,22 +263,20 @@ def simulate_measurements_ms(ctx_args, N_Paths):
         dr.enable_grad(real)
         dr.enable_grad(imag)
 
-    for T_i in range(sparams.mimo_system.get_param('N_Tx')):
-        Ti = mi.Vector3f(dr.slice(sparams.mimo_system.get_param('Tx'), T_i))
+    n_successful, n_unsuccessful = 0, 0
+    for T_i in range(N_Tx):
+        Ti = mi.Vector3f(dr.slice(sparams.mimo_system.get_param("Tx"), T_i))
 
         for R_i in range(sparams.mimo_system.get_param('N_Rx')):
             Ri = mi.Vector3f(dr.slice(sparams.mimo_system.get_param('Rx'), R_i))
 
-            ms_success = False
-            ms_success, v_final = ms.sample_manifold(Ti, Ri, scene, 0.02, 1e-5, 250)
-            if ms_success:
-                
-                pts = dr.slice(v_final.p, 0)
-                n_paths = 1
+            sms_success, v_final = sms.sample_manifold(Ti, Ri, scene, 0.02, 1e-5, 100)
+            pts = dr.slice(v_final.p, 0)
+            n_paths = 1
+            if sms_success:
+                n_successful += 1
             else:
-                print("MS FAILED")
-                pts = dr.slice(v_final.p, 0)
-                n_paths = 1
+                n_unsuccessful += 1
 
             ray_d = dr.normalize(pts - Ti)
             rays = mi.Ray3f(o=Ti, d=ray_d)
@@ -294,6 +292,8 @@ def simulate_measurements_ms(ctx_args, N_Paths):
 
             real, imag = get_measurement(real, imag, dist, amps, T_i, R_i, Fq_t)
 
+    n_samples = n_successful + n_unsuccessful
+    print(f"SMS worked {n_successful} out of {n_samples} times ({((n_successful / n_samples) * 100.0):.1f}%)!")
     return real, imag
 
 def simulate_measurements(ctx_args, use_ms):
