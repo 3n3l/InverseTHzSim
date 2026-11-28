@@ -251,9 +251,8 @@ def calc_paths(si, Rx, N_Paths, depth=1):
     return dist, amp
 
 # Run Simulation
-def simulate_measurements_ms(ctx_args, N_Paths):
-    scene = ctx_args['scene']
-    n_paths = 50
+def simulate_measurements_sms(ctx_args, n_paths):
+    scene = ctx_args["scene"]
 
     smp.init_RNG(n_paths)
     real = dr.zeros(mi.TensorXf, shape=[sparams.mimo_system.get_param('N_Tx'), sparams.mimo_system.get_param('N_Rx'), sparams.mimo_system.get_param('N_Fq')])
